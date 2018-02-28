@@ -6,6 +6,7 @@
 #include <SketchUpAPI/sketchup.h>
 
 #include "SUAPI-CppWrapper/model/TypedValue.hpp"
+#include "SUAPI-CppWrapper/String.hpp"
 
 
 TEST(TypedValue, bool_value_true)
@@ -68,4 +69,44 @@ TEST(TypedValue, typed_value_array_GetInts)
   ASSERT_EQ(0, values.at(0).int32_value());
   ASSERT_EQ(1, values.at(1).int32_value());
   ASSERT_EQ(2, values.at(2).int32_value());
+}
+
+TEST(TypedValue, typed_value_array_GetMixed)
+{
+  // Create the array container
+  SUTypedValueRef su_typed_value_array = SU_INVALID;
+  SU(SUTypedValueCreate(&su_typed_value_array));
+
+
+  int32_t i = 1;
+  SUTypedValueRef su_typed_value_int = SU_INVALID;
+  SU(SUTypedValueCreate(&su_typed_value_int));
+  SU(SUTypedValueSetInt32(su_typed_value_int, i));
+
+  double d = 2.0;
+  SUTypedValueRef su_typed_value_double = SU_INVALID;
+  SU(SUTypedValueCreate(&su_typed_value_double));
+  SU(SUTypedValueSetDouble(su_typed_value_double, d));
+
+  const char str[] = "three";
+  SUTypedValueRef su_typed_value_string = SU_INVALID;
+  SU(SUTypedValueCreate(&su_typed_value_string));
+  SU(SUTypedValueSetString(su_typed_value_string, str));
+
+  std::vector<SUTypedValueRef> su_values;
+
+  su_values.emplace_back(su_typed_value_int);
+  su_values.emplace_back(su_typed_value_double);
+  su_values.emplace_back(su_typed_value_string);
+
+  SU(SUTypedValueSetArrayItems(su_typed_value_array, su_values.size(), su_values.data()));
+
+  CW::TypedValue typed_value(su_typed_value_array);
+  auto values = typed_value.typed_value_array();
+
+  ASSERT_EQ(3, values.size());
+
+  ASSERT_EQ(1, values.at(0).int32_value());
+  ASSERT_EQ(2.0, values.at(1).double_value());
+  ASSERT_EQ("three", values.at(2).string_value());
 }
