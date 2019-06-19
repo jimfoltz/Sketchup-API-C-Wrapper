@@ -33,6 +33,7 @@
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <cmath>
 
 #include <SketchUpAPI/geometry.h>
 #include <SketchUpAPI/model/entities.h>
